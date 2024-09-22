@@ -1,0 +1,30 @@
+<div class="container">
+  <h1>ToDo List</h1>
+
+  <div class="">
+    <input
+      [(ngModel)]="newTodoTitle"
+      placeholder="Add a new task"
+      class="form-control"
+    />
+    <button (click)="addTodo()" class="">Add</button>
+  </div>
+
+  <ul class="">
+    @for (todo of todos; track todo.id) {
+    <li class="flex gap-4">
+      <div>
+        <input
+          type="checkbox"
+          (change)="toggleComplete(todo)"
+          [checked]="todo.completed"
+        />
+        <span class="">{{ todo.title }}</span>
+      </div>
+      <button (click)="deleteTodo(todo.id)" class="btn btn-danger btn-sm">
+        Delete
+      </button>
+    </li>
+    }
+  </ul>
+</div>
