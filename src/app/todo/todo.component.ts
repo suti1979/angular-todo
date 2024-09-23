@@ -1,11 +1,12 @@
 import { Component, OnInit } from '@angular/core'
-import { Todo } from './todo.model'
+// import { Todo } from './todo.model'
 import { FormsModule } from '@angular/forms'
 import { catchError } from 'rxjs/operators'
 import { of } from 'rxjs'
-import { TodoService } from './todo.service'
+// import { TodoService } from './todo.service'
 import { JsonPipe } from '@angular/common'
-
+import { TodoItemsService as TodoService } from '../api/api/todoItems.service'
+import { TodoItem } from '../api'
 @Component({
   selector: 'app-todo',
   standalone: true,
@@ -13,7 +14,7 @@ import { JsonPipe } from '@angular/common'
   templateUrl: './todo.component.html'
 })
 export class TodoComponent implements OnInit {
-  todos: Todo[] = []
+  todos: TodoItem[] = []
   newTodoTitle: string = ''
   nextId: number = 1
   errorMessage: string = ''
@@ -27,24 +28,18 @@ export class TodoComponent implements OnInit {
   }
 
   getTodos() {
-    this.todoService
-      .fetchTodos()
-      .pipe(
-        catchError((error) => {
-          console.error('Error fetching todos:', error)
-          this.errorMessage = 'Failed to load todos. Please try again later.'
-          return of([])
-        })
-      )
-      .subscribe((data) => {
-        this.todos = data
-        this.loading = false
+    this.todoService.apiTodoItemsGet().pipe(
+      catchError((error) => {
+        console.error('Error fetching todos:', error)
+        this.errorMessage = 'Failed to load todos. Please try again later.'
+        return of([])
       })
+    )
   }
 
   addTodo() {
     this.todoService
-      .addTodo({
+      .apiTodoItemsPost({
         name: this.newTodoTitle,
         isComplete: false
       })
@@ -54,15 +49,15 @@ export class TodoComponent implements OnInit {
       })
   }
 
-  deleteTodo(id: number) {
-    this.todoService.deleteTodo(id).subscribe(() => {
+  deleteTodo(id: string) {
+    this.todoService.apiTodoItemsIdDelete(id).subscribe(() => {
       this.getTodos()
     })
   }
 
-  toggleComplete(todo: Todo) {
+  toggleComplete(todo: TodoItem) {
     const updatedTodo = { ...todo, isComplete: !todo.isComplete }
-    this.todoService.updateTodo(updatedTodo).subscribe(() => {
+    this.todoService.apiTodoItemsIdPut(updatedTodo.id ?? '', updatedTodo).subscribe(() => {
       this.getTodos()
     })
   }
