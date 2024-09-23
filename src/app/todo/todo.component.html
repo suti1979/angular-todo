@@ -1,9 +1,13 @@
-<div class="container">
-  <h1>ToDo List</h1>
+<div class="">
+  <h1 class="text-2xl font-bold mb-4">ToDo List</h1>
 
-  <div class="">
-    <input [(ngModel)]="newTodoTitle" placeholder="Add a new task" class="form-control" />
-    <button (click)="addTodo()" class="">Add</button>
+  <div class="flex gap-4">
+    <input
+      [(ngModel)]="newTodoTitle"
+      placeholder="Add a new task"
+      class="p-2 rounded-md border border-neutral-300"
+    />
+    <button (click)="addTodo()" class="bg-blue-500 text-white px-4 py-2 rounded-md">Add</button>
   </div>
 
   @if (loading) {
@@ -12,15 +16,20 @@
   <p class="text-red-500">{{ errorMessage }}</p>
   }
 
-  <ul class="">
+  <ul class="mt-4 border border-neutral-300 rounded-md p-4 bg-neutral-50">
     @for (todo of todos; track todo.id) {
-    <li class="flex gap-4">
-      <div>
-        <pre class="text-sm">{{ todo | json }}</pre>
+    <li class="grid grid-cols-2 space-y-2">
+      <div class="flex items-center gap-4">
+        <!-- <pre class="text-sm">{{ todo | json }}</pre> -->
         <input type="checkbox" (change)="toggleComplete(todo)" [checked]="todo.isComplete" />
         <span class="">{{ todo.name }}</span>
       </div>
-      <button (click)="deleteTodo(todo.id)" class="btn btn-danger btn-sm">Delete</button>
+      <button
+        (click)="deleteTodo(todo.id)"
+        class="bg-red-500 justify-self-end text-white px-4 py-1 rounded-md"
+      >
+        Delete
+      </button>
     </li>
     }
   </ul>
