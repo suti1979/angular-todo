@@ -23,6 +23,10 @@ export class TodoComponent implements OnInit {
 
   ngOnInit() {
     this.loading = true
+    this.getTodos()
+  }
+
+  getTodos() {
     this.todoService
       .fetchTodos()
       .pipe(
@@ -44,22 +48,22 @@ export class TodoComponent implements OnInit {
         name: this.newTodoTitle,
         isComplete: false
       })
-      .subscribe((response) => {
-        this.todos.push(response as Todo)
+      .subscribe(() => {
+        this.getTodos()
         this.newTodoTitle = ''
       })
   }
 
   deleteTodo(id: number) {
     this.todoService.deleteTodo(id).subscribe(() => {
-      this.todos = this.todos.filter((todo) => todo.id !== id)
+      this.getTodos()
     })
   }
 
   toggleComplete(todo: Todo) {
     const updatedTodo = { ...todo, isComplete: !todo.isComplete }
     this.todoService.updateTodo(updatedTodo).subscribe(() => {
-      this.todos = this.todos.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
+      this.getTodos()
     })
   }
 }
