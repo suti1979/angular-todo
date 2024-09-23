@@ -1,64 +1,65 @@
-import { Component, OnInit } from '@angular/core';
-import { Todo } from './todo.model';
-import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
-
-// import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core'
+import { Todo } from './todo.model'
+import { FormsModule } from '@angular/forms'
+import { catchError } from 'rxjs/operators'
+import { of } from 'rxjs'
+import { TodoService } from './todo.service'
+import { JsonPipe } from '@angular/common'
 
 @Component({
   selector: 'app-todo',
   standalone: true,
-  imports: [FormsModule],
-  templateUrl: './todo.component.html',
+  imports: [FormsModule, JsonPipe],
+  templateUrl: './todo.component.html'
 })
 export class TodoComponent implements OnInit {
-  todos: Todo[] = [];
-  newTodoTitle: string = '';
-  nextId: number = 1;
+  todos: Todo[] = []
+  newTodoTitle: string = ''
+  nextId: number = 1
+  errorMessage: string = ''
+  loading: boolean = false
 
-  constructor(private http: HttpClient) {}
+  constructor(private todoService: TodoService) {}
 
   ngOnInit() {
-    // this.loadTodos();
-    this.fetchTodos();
+    this.loading = true
+    this.todoService
+      .fetchTodos()
+      .pipe(
+        catchError((error) => {
+          console.error('Error fetching todos:', error)
+          this.errorMessage = 'Failed to load todos. Please try again later.'
+          return of([])
+        })
+      )
+      .subscribe((data) => {
+        this.todos = data
+        this.loading = false
+      })
   }
 
   addTodo() {
-    this.todos.push({
-      id: this.nextId++,
-      title: this.newTodoTitle,
-      completed: false,
-    });
-    this.saveTodos();
-    this.newTodoTitle = '';
-  }
-
-  saveTodos() {
-    localStorage.setItem('todos', JSON.stringify(this.todos));
-  }
-
-  loadTodos() {
-    const storedTodos = localStorage.getItem('todos');
-    if (storedTodos) {
-      this.todos = JSON.parse(storedTodos);
-    }
-  }
-
-  fetchTodos() {
-    this.http
-      .get<Todo[]>('https://jsonplaceholder.typicode.com/todos') // Fetch from API
-      .subscribe((data) => {
-        this.todos = data; // Assign fetched data to todos
-      });
+    this.todoService
+      .addTodo({
+        name: this.newTodoTitle,
+        isComplete: false
+      })
+      .subscribe((response) => {
+        this.todos.push(response as Todo)
+        this.newTodoTitle = ''
+      })
   }
 
   deleteTodo(id: number) {
-    this.todos = this.todos.filter((todo) => todo.id !== id);
-    this.saveTodos();
+    this.todoService.deleteTodo(id).subscribe(() => {
+      this.todos = this.todos.filter((todo) => todo.id !== id)
+    })
   }
 
   toggleComplete(todo: Todo) {
-    todo.completed = !todo.completed;
-    this.saveTodos();
+    const updatedTodo = { ...todo, isComplete: !todo.isComplete }
+    this.todoService.updateTodo(updatedTodo).subscribe(() => {
+      this.todos = this.todos.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
+    })
   }
 }
