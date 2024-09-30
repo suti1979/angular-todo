@@ -6,7 +6,7 @@ import { of } from 'rxjs'
 import { TodoService } from './todo.service'
 import { JsonPipe } from '@angular/common'
 // import { TodoItemsService as TodoService } from '../api/api/todoItems.service'
-import { TodoItem } from '../api'
+// import { TodoItem } from '../api/Api'
 @Component({
   selector: 'app-todo',
   standalone: true,
