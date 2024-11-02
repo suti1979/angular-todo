@@ -1,5 +1,7 @@
+@if (todoService.getTodos().length > 0) {
 <div
-  class="absolute -top-2 -right-2 rounded-full bg-red-500 text-white w-6 h-6 flex items-center justify-center"
+  class="absolute -top-3 -right-3 rounded-full bg-red-500 text-white w-6 h-6 flex items-center justify-center"
 >
   {{ todoService.getTodos().length }}
 </div>
+}
