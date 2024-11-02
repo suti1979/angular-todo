@@ -9,9 +9,9 @@
     />
     <button
       (click)="todoService.addTodo(newTodoTitle); newTodoTitle = ''"
-      class="bg-blue-500 text-white px-4 py-2 rounded-md w-[154px]"
+      class="border border-blue-800 text-blue-800 px-4 py-2 rounded-md font-bold hover:bg-blue-300"
     >
-      Add
+      +
     </button>
   </div>
 
@@ -19,9 +19,9 @@
 
   <ul class="mt-4 border border-neutral-300 rounded-md p-4 bg-neutral-50">
     @for (todo of todoService.getTodos(); track todo.id) {
-    <li class="grid grid-cols-2 space-y-2">
+    <li class="grid grid-cols-1 md:grid-cols-2 space-y-2">
       <div class="flex items-center gap-4">
-        <pre class="text-xs">{{ todo | json }}</pre>
+        <!-- <pre class="text-xs">{{ todo | json }}</pre> -->
         <input
           type="checkbox"
           (change)="todoService.toggleComplete(todo)"
@@ -31,9 +31,9 @@
       </div>
       <button
         (click)="todoService.deleteTodo(todo.id)"
-        class="bg-red-500 justify-self-end text-white px-4 py-1 rounded-md w-28"
+        class="border border-red-800 text-red-800 hover:bg-red-300 justify-self-end px-2 py-1 rounded-md w-9"
       >
-        Delete
+        X
       </button>
     </li>
     }
