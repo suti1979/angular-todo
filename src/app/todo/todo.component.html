@@ -1,5 +1,5 @@
 <div class="">
-  <h1 class="text-2xl font-bold mb-4">ToDo List</h1>
+  <h1 class="text-2xl font-bold mb-4">Test</h1>
 
   <div class="flex gap-4">
     <input
@@ -7,25 +7,28 @@
       placeholder="Add a new task"
       class="p-2 rounded-md border border-neutral-300"
     />
-    <button (click)="addTodo()" class="bg-blue-500 text-white px-4 py-2 rounded-md">Add</button>
+    <button
+      (click)="todoService.addTodo(newTodoTitle); newTodoTitle = ''"
+      class="bg-blue-500 text-white px-4 py-2 rounded-md"
+    >
+      Add
+    </button>
   </div>
 
-  @if (loading) {
-  <p>Loading...</p>
-  } @if (errorMessage) {
-  <p class="text-red-500">{{ errorMessage }}</p>
-  }
-
   <ul class="mt-4 border border-neutral-300 rounded-md p-4 bg-neutral-50">
-    @for (todo of todos; track todo.id) {
+    @for (todo of todoService.getTodos(); track todo.id) {
     <li class="grid grid-cols-2 space-y-2">
       <div class="flex items-center gap-4">
-        <!-- <pre class="text-sm">{{ todo | json }}</pre> -->
-        <input type="checkbox" (change)="toggleComplete(todo)" [checked]="todo.isComplete" />
-        <span class="">{{ todo.name }}</span>
+        <pre class="text-sm">{{ todo | json }}</pre>
+        <input
+          type="checkbox"
+          (change)="todoService.toggleComplete(todo)"
+          [checked]="todo.isComplete"
+        />
+        <span [class]="todo.isComplete ? 'line-through' : ''">{{ todo.name }}</span>
       </div>
       <button
-        (click)="deleteTodo(todo.id)"
+        (click)="todoService.deleteTodo(todo.id)"
         class="bg-red-500 justify-self-end text-white px-4 py-1 rounded-md"
       >
         Delete
