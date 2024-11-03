@@ -9,15 +9,16 @@ const LOCALSTORAGE_KEY = 'todos-sti'
 export class TodoService {
   private todos = signal<Todo[]>([])
 
-  constructor() {
-    if (localStorage.getItem(LOCALSTORAGE_KEY)) {
-      this.todos.set(JSON.parse(localStorage.getItem(LOCALSTORAGE_KEY) || '[]'))
-    }
+  // NOTE:if we need to strore data like in local storage
+  // constructor() {
+  //   if (localStorage.getItem(LOCALSTORAGE_KEY)) {
+  //     this.todos.set(JSON.parse(localStorage.getItem(LOCALSTORAGE_KEY) || '[]'))
+  //   }
 
-    effect(() => {
-      localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(this.todos()))
-    })
-  }
+  //   effect(() => {
+  //     localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(this.todos()))
+  //   })
+  // }
 
   getTodos = this.todos.asReadonly()
 
