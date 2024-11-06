@@ -38,8 +38,8 @@ export class HubService {
 
   private addRefreshDataListener() {
     this.hubConnection.on('RefreshData', () => {
-      console.log('RefreshData')
       this.dataUpdated.set(true)
+      console.log('RefreshData', this.dataUpdated())
     })
   }
 }

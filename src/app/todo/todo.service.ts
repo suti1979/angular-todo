@@ -15,13 +15,10 @@ export class TodoService {
 
   constructor() {
     this.loadTodos()
-  }
 
-  ngOnInit() {
     effect(() => {
-      if (this.hubService.dataUpdated) {
+      if (this.hubService.dataUpdated()) {
         this.loadTodos()
-        this.hubService.dataUpdated.set(false)
       }
     })
   }
@@ -29,9 +26,10 @@ export class TodoService {
   getTodos = this.todos.asReadonly()
 
   loadTodos() {
-    this.httpClient
-      .get<Todo[]>(`${environment.apiUrl}/api/TodoItems`)
-      .subscribe((todos) => this.todos.set(todos))
+    this.httpClient.get<Todo[]>(`${environment.apiUrl}/api/TodoItems`).subscribe((todos) => {
+      this.todos.set(todos)
+      this.hubService.dataUpdated.set(false)
+    })
   }
 
   addTodo(todo: string) {
@@ -41,23 +39,19 @@ export class TodoService {
     }
 
     this.httpClient.post<Todo>(`${environment.apiUrl}/api/TodoItems`, newTodo).subscribe((todo) => {
-      this.todos.update((todos) => [...todos, todo])
+      // this.todos.update((todos) => [...todos, todo])
     })
   }
 
   toggleComplete(todo: Todo) {
     todo.isComplete = !todo.isComplete
 
-    this.httpClient
-      .put<Todo>(`${environment.apiUrl}/api/TodoItems/${todo.id}`, todo)
-      .subscribe((todo) => {
-        this.todos.update((todos) => todos.map((t) => (t.id === todo.id ? todo : t)))
-      })
+    this.httpClient.put<Todo>(`${environment.apiUrl}/api/TodoItems/${todo.id}`, todo).subscribe()
   }
 
   deleteTodo(id: string) {
     this.httpClient.delete(`${environment.apiUrl}/api/TodoItems/${id}`).subscribe(() => {
-      this.todos.update((todos) => todos.filter((todo) => todo.id !== id))
+      // this.todos.update((todos) => todos.filter((todo) => todo.id !== id))
     })
   }
 
@@ -65,7 +59,7 @@ export class TodoService {
     this.httpClient
       .put<Todo>(`${environment.apiUrl}/api/TodoItems/${todo.id}`, todo)
       .subscribe((todo) => {
-        this.todos.update((todos) => todos.map((t) => (t.id === todo.id ? todo : t)))
+        // this.todos.update((todos) => todos.map((t) => (t.id === todo.id ? todo : t)))
       })
   }
 }
