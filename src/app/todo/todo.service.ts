@@ -17,7 +17,8 @@ export class TodoService {
     this.loadTodos()
 
     effect(() => {
-      if (this.hubService.dataUpdated()) {
+      if (this.hubService.dataUpdated()?.includes('COURIER')) {
+        console.log('COURIER update')
         this.loadTodos()
       }
     })
@@ -28,7 +29,6 @@ export class TodoService {
   loadTodos() {
     this.httpClient.get<Todo[]>(`${environment.apiUrl}/api/TodoItems`).subscribe((todos) => {
       this.todos.set(todos)
-      this.hubService.dataUpdated.set(false)
     })
   }
 

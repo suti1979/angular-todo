@@ -7,7 +7,7 @@ import { environment } from '../../environments/environment.development'
 })
 export class HubService {
   private hubConnection!: signalR.HubConnection
-  public dataUpdated: WritableSignal<boolean> = signal(false)
+  public dataUpdated: WritableSignal<'ADDRESS' | 'COURIER' | null> = signal(null)
 
   constructor() {
     this.startConnection()
@@ -37,8 +37,8 @@ export class HubService {
   }
 
   private addRefreshDataListener() {
-    this.hubConnection.on('RefreshData', () => {
-      this.dataUpdated.set(true)
+    this.hubConnection.on('RefreshData', (data) => {
+      this.dataUpdated.set(data)
       console.log('RefreshData', this.dataUpdated())
     })
   }
