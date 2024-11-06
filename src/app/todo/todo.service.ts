@@ -1,7 +1,8 @@
-import { effect, Injectable, signal } from '@angular/core'
+import { effect, inject, Injectable, signal } from '@angular/core'
 import { Todo } from './todo.model'
-
-const LOCALSTORAGE_KEY = 'todos-sti'
+import { HubService } from '../services/hub.service'
+import { HttpClient } from '@angular/common/http'
+import { environment } from '../../environments/environment.development'
 
 @Injectable({
   providedIn: 'root'
@@ -9,39 +10,62 @@ const LOCALSTORAGE_KEY = 'todos-sti'
 export class TodoService {
   private todos = signal<Todo[]>([])
 
-  // NOTE:if we need to strore data like in local storage
-  // constructor() {
-  //   if (localStorage.getItem(LOCALSTORAGE_KEY)) {
-  //     this.todos.set(JSON.parse(localStorage.getItem(LOCALSTORAGE_KEY) || '[]'))
-  //   }
+  private hubService = inject(HubService)
+  private httpClient = inject(HttpClient)
 
-  //   effect(() => {
-  //     localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(this.todos()))
-  //   })
-  // }
+  constructor() {
+    this.loadTodos()
+  }
+
+  ngOnInit() {
+    effect(() => {
+      if (this.hubService.dataUpdated) {
+        this.loadTodos()
+        this.hubService.dataUpdated.set(false)
+      }
+    })
+  }
 
   getTodos = this.todos.asReadonly()
+
+  loadTodos() {
+    this.httpClient
+      .get<Todo[]>(`${environment.apiUrl}/api/TodoItems`)
+      .subscribe((todos) => this.todos.set(todos))
+  }
 
   addTodo(todo: string) {
     const newTodo = {
       name: todo,
-      isComplete: false,
-      id: Date.now().toString()
+      isComplete: false
     }
-    this.todos.update((todos) => [...todos, newTodo])
+
+    this.httpClient.post<Todo>(`${environment.apiUrl}/api/TodoItems`, newTodo).subscribe((todo) => {
+      this.todos.update((todos) => [...todos, todo])
+    })
   }
 
   toggleComplete(todo: Todo) {
-    this.todos.update((todos) =>
-      todos.map((t) => (t.id === todo.id ? { ...t, isComplete: !t.isComplete } : t))
-    )
+    todo.isComplete = !todo.isComplete
+
+    this.httpClient
+      .put<Todo>(`${environment.apiUrl}/api/TodoItems/${todo.id}`, todo)
+      .subscribe((todo) => {
+        this.todos.update((todos) => todos.map((t) => (t.id === todo.id ? todo : t)))
+      })
   }
 
   deleteTodo(id: string) {
-    this.todos.update((todos) => todos.filter((todo) => todo.id !== id))
+    this.httpClient.delete(`${environment.apiUrl}/api/TodoItems/${id}`).subscribe(() => {
+      this.todos.update((todos) => todos.filter((todo) => todo.id !== id))
+    })
   }
 
   updateTodo(todo: Todo) {
-    this.todos.update((todos) => todos.map((t) => (t.id === todo.id ? todo : t)))
+    this.httpClient
+      .put<Todo>(`${environment.apiUrl}/api/TodoItems/${todo.id}`, todo)
+      .subscribe((todo) => {
+        this.todos.update((todos) => todos.map((t) => (t.id === todo.id ? todo : t)))
+      })
   }
 }
