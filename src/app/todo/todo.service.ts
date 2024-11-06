@@ -33,33 +33,20 @@ export class TodoService {
   }
 
   addTodo(todo: string) {
-    const newTodo = {
-      name: todo,
-      isComplete: false
-    }
-
-    this.httpClient.post<Todo>(`${environment.apiUrl}/api/TodoItems`, newTodo).subscribe((todo) => {
-      // this.todos.update((todos) => [...todos, todo])
-    })
+    const newTodo = { name: todo, isComplete: false }
+    this.httpClient.post<Todo>(`${environment.apiUrl}/api/TodoItems`, newTodo).subscribe()
   }
 
   toggleComplete(todo: Todo) {
     todo.isComplete = !todo.isComplete
-
     this.httpClient.put<Todo>(`${environment.apiUrl}/api/TodoItems/${todo.id}`, todo).subscribe()
   }
 
   deleteTodo(id: string) {
-    this.httpClient.delete(`${environment.apiUrl}/api/TodoItems/${id}`).subscribe(() => {
-      // this.todos.update((todos) => todos.filter((todo) => todo.id !== id))
-    })
+    this.httpClient.delete(`${environment.apiUrl}/api/TodoItems/${id}`).subscribe()
   }
 
   updateTodo(todo: Todo) {
-    this.httpClient
-      .put<Todo>(`${environment.apiUrl}/api/TodoItems/${todo.id}`, todo)
-      .subscribe((todo) => {
-        // this.todos.update((todos) => todos.map((t) => (t.id === todo.id ? todo : t)))
-      })
+    this.httpClient.put<Todo>(`${environment.apiUrl}/api/TodoItems/${todo.id}`, todo).subscribe()
   }
 }
