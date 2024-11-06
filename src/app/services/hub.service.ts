@@ -11,7 +11,6 @@ export class HubService {
 
   constructor() {
     this.startConnection()
-    this.recieveMessage()
     this.addRefreshDataListener()
   }
 
@@ -24,16 +23,6 @@ export class HubService {
       .build()
 
     this.hubConnection.start().catch((err) => console.error(err))
-  }
-
-  recieveMessage(): void {
-    this.hubConnection.on('ReceiveMessage', (user, message) => {
-      console.log(`User: ${user}, Message: ${message}`)
-    })
-  }
-
-  sendMessage(user: string, message: string): void {
-    this.hubConnection.invoke('SendMessage', user, message).catch((err) => console.error(err))
   }
 
   private addRefreshDataListener() {
